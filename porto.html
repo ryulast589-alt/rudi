@@ -1,0 +1,1452 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RUDI - Portfolio TKJ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --neon-red: #ff1744;
+            --neon-white: #ffffff;
+            --neon-black: #0a0a0a;
+            --glow-red: rgba(255, 23, 68, 0.6);
+            --glow-white: rgba(255, 255, 255, 0.5);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--neon-black);
+            color: var(--neon-white);
+            overflow-x: hidden;
+        }
+
+        /* Loading Screen */
+        #loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: var(--neon-black);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            transition: opacity 0.5s ease;
+        }
+
+        .loader {
+            width: 80px;
+            height: 80px;
+            border: 4px solid transparent;
+            border-top-color: var(--neon-red);
+            border-bottom-color: var(--neon-red);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            box-shadow: 0 0 30px var(--glow-red);
+        }
+
+        .loader-inner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid transparent;
+            border-left-color: var(--neon-white);
+            border-right-color: var(--neon-white);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite reverse;
+            margin: 11px;
+            box-shadow: 0 0 20px var(--glow-white);
+        }
+
+        .loading-text {
+            margin-top: 30px;
+            font-size: 22px;
+            color: var(--neon-red);
+            text-shadow: 0 0 20px var(--glow-red);
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Video Background */
+        #bg-video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -2;
+            opacity: 50;
+        }
+
+        .video-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(10,10,10,0.88) 0%, rgba(20,20,20,0.82) 100%);
+            z-index: -1;
+        }
+
+        /* Particle Background */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--neon-red);
+            border-radius: 50%;
+            animation: float-particle 15s infinite;
+            box-shadow: 0 0 10px var(--glow-red);
+        }
+
+        @keyframes float-particle {
+            0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100vh) translateX(50px); opacity: 0; }
+        }
+
+        /* Header & Navigation */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 15px 20px;
+            background: rgba(10,10,10,0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 2px solid rgba(255,23,68,0.3);
+            box-shadow: 0 0 20px rgba(255,23,68,0.2);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--neon-red);
+            text-shadow: 0 0 25px var(--glow-red), 0 0 40px var(--glow-red);
+            animation: logo-glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes logo-glow {
+            from { text-shadow: 0 0 20px var(--glow-red); }
+            to { text-shadow: 0 0 35px var(--glow-red), 0 0 50px var(--glow-red); }
+        }
+
+        .hamburger {
+            width: 30px;
+            height: 25px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        .hamburger span {
+            width: 100%;
+            height: 3px;
+            background: var(--neon-red);
+            transition: 0.3s;
+            box-shadow: 0 0 12px var(--glow-red);
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(8px, 8px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(8px, -8px);
+        }
+
+        .nav-menu {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 75%;
+            height: 100vh;
+            background: rgba(10,10,10,0.98);
+            backdrop-filter: blur(20px);
+            padding: 80px 30px;
+            transition: 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            border-left: 2px solid rgba(255,23,68,0.4);
+            box-shadow: -5px 0 30px rgba(255,23,68,0.3);
+        }
+
+        .nav-menu.active {
+            right: 0;
+        }
+
+        .nav-menu a {
+            display: block;
+            padding: 18px 0;
+            color: var(--neon-white);
+            text-decoration: none;
+            font-size: 20px;
+            transition: 0.3s;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            text-shadow: 0 0 10px var(--glow-white);
+        }
+
+        .nav-menu a:hover {
+            color: var(--neon-red);
+            text-shadow: 0 0 20px var(--glow-red);
+            transform: translateX(15px);
+            padding-left: 10px;
+        }
+
+        /* Music Control */
+        .music-control {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: rgba(255,23,68,0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 999;
+            box-shadow: 0 0 30px var(--glow-red);
+            animation: music-pulse 2s ease-in-out infinite;
+            transition: 0.3s;
+        }
+
+        .music-control:hover {
+            transform: scale(1.1);
+        }
+
+        @keyframes music-pulse {
+            0%, 100% { box-shadow: 0 0 20px var(--glow-red); }
+            50% { box-shadow: 0 0 40px var(--glow-red), 0 0 60px var(--glow-red); }
+        }
+
+        .music-icon {
+            font-size: 28px;
+            color: white;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 90px 20px 40px;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, var(--glow-red), transparent);
+            border-radius: 50%;
+            filter: blur(80px);
+            animation: hero-glow 3s ease-in-out infinite alternate;
+            z-index: -1;
+        }
+
+        @keyframes hero-glow {
+            0% { opacity: 0.3; transform: scale(1); }
+            100% { opacity: 0.6; transform: scale(1.2); }
+        }
+
+        .profile-container {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .profile-ring {
+            width: 230px;
+            height: 230px;
+            border: 3px solid var(--neon-red);
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: rotate-ring 4s linear infinite;
+            box-shadow: 0 0 40px var(--glow-red), inset 0 0 30px var(--glow-red);
+        }
+
+        @keyframes rotate-ring {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .profile-img {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--neon-red);
+            box-shadow: 0 0 40px var(--glow-red), inset 0 0 20px rgba(0,0,0,0.5);
+            animation: float 3s ease-in-out infinite;
+            position: relative;
+            z-index: 2;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .hero-content {
+            animation: fadeInScale 1s ease;
+        }
+
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: var(--neon-red);
+            text-shadow: 0 0 30px var(--glow-red), 0 0 50px var(--glow-red);
+            animation: glow-text 2s ease-in-out infinite alternate;
+            letter-spacing: 3px;
+        }
+
+        @keyframes glow-text {
+            from { text-shadow: 0 0 20px var(--glow-red); }
+            to { text-shadow: 0 0 40px var(--glow-red), 0 0 60px var(--glow-red); }
+        }
+
+        .hero .subtitle {
+            font-size: 20px;
+            color: var(--neon-white);
+            margin-bottom: 12px;
+            font-weight: 600;
+            text-shadow: 0 0 15px var(--glow-white);
+            animation: slideInLeft 0.8s ease;
+        }
+
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .hero .school-info {
+            font-size: 16px;
+            color: rgba(255,255,255,0.85);
+            line-height: 1.8;
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255,23,68,0.1);
+            border-radius: 15px;
+            border: 1px solid rgba(255,23,68,0.3);
+            backdrop-filter: blur(10px);
+            animation: slideInRight 0.8s ease;
+            box-shadow: 0 0 20px rgba(255,23,68,0.2);
+        }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .hero .school-info strong {
+            color: var(--neon-red);
+            text-shadow: 0 0 10px var(--glow-red);
+        }
+
+        /* Decorative Elements */
+        .hero-badge {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 25px;
+            background: linear-gradient(135deg, rgba(255,23,68,0.2), rgba(255,23,68,0.05));
+            border: 2px solid var(--neon-red);
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--neon-white);
+            text-shadow: 0 0 10px var(--glow-white);
+            box-shadow: 0 0 25px var(--glow-red);
+            animation: badge-float 3s ease-in-out infinite;
+        }
+
+        @keyframes badge-float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Section Styles */
+        section {
+            padding: 70px 20px;
+            animation: fadeInUp 0.8s ease;
+            position: relative;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-title {
+            font-size: 36px;
+            color: var(--neon-red);
+            text-align: center;
+            margin-bottom: 40px;
+            text-shadow: 0 0 25px var(--glow-red), 0 0 40px var(--glow-red);
+            animation: title-glow 2s ease-in-out infinite alternate;
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: var(--neon-red);
+            box-shadow: 0 0 15px var(--glow-red);
+            animation: line-expand 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes line-expand {
+            from { width: 60px; }
+            to { width: 100px; }
+        }
+
+        @keyframes title-glow {
+            from { text-shadow: 0 0 20px var(--glow-red); }
+            to { text-shadow: 0 0 35px var(--glow-red), 0 0 55px var(--glow-red); }
+        }
+
+        .card {
+            background: rgba(20,20,20,0.8);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255,23,68,0.3);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 25px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 5px 25px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,23,68,0.1), transparent);
+            transform: rotate(45deg);
+            transition: 0.5s;
+        }
+
+        .card:hover::before {
+            animation: card-shine 1.5s infinite;
+        }
+
+        @keyframes card-shine {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
+        }
+
+        .card:hover {
+            border-color: var(--neon-red);
+            box-shadow: 0 0 35px var(--glow-red), 0 10px 40px rgba(0,0,0,0.5);
+            transform: translateY(-10px) scale(1.02);
+        }
+
+        .card h3 {
+            color: var(--neon-red);
+            margin-bottom: 15px;
+            font-size: 24px;
+            text-shadow: 0 0 15px var(--glow-red);
+            position: relative;
+            z-index: 1;
+        }
+
+        .card p {
+            color: rgba(255,255,255,0.9);
+            line-height: 1.8;
+            font-size: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Skills Progress Bars */
+        .skills-container {
+            margin-top: 20px;
+        }
+
+        .skill-item {
+            margin-bottom: 25px;
+        }
+
+        .skill-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            color: var(--neon-white);
+            font-weight: 600;
+        }
+
+        .skill-name {
+            text-shadow: 0 0 10px var(--glow-white);
+        }
+
+        .skill-percent {
+            color: var(--neon-red);
+            text-shadow: 0 0 15px var(--glow-red);
+            font-weight: bold;
+        }
+
+        .skill-bar {
+            width: 100%;
+            height: 25px;
+            background: rgba(10,10,10,0.7);
+            border-radius: 50px;
+            overflow: hidden;
+            border: 2px solid rgba(255,23,68,0.3);
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        .skill-progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-red), #ff4569, var(--neon-red));
+            background-size: 200% 100%;
+            border-radius: 50px;
+            position: relative;
+            animation: skill-load 2s ease-out forwards, gradient-shift 3s ease-in-out infinite;
+            box-shadow: 0 0 25px var(--glow-red);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 15px;
+        }
+
+        @keyframes skill-load {
+            from { width: 0; }
+        }
+
+        @keyframes gradient-shift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .skill-progress::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: progress-shine 2s infinite;
+        }
+
+        @keyframes progress-shine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Quote Section */
+        .quote-section {
+            text-align: center;
+            padding: 60px 20px;
+            background: linear-gradient(135deg, rgba(255,23,68,0.08) 0%, rgba(20,20,20,0.4) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quote-section::before {
+            content: '"';
+            position: absolute;
+            top: -50px;
+            left: 20px;
+            font-size: 200px;
+            color: rgba(255,23,68,0.1);
+            font-family: Georgia, serif;
+        }
+
+        .quote-item {
+            margin-bottom: 40px;
+            animation: quote-fade 1s ease;
+        }
+
+        @keyframes quote-fade {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .quote-text {
+            font-size: 20px;
+            font-style: italic;
+            color: var(--neon-white);
+            margin-bottom: 18px;
+            line-height: 2;
+            text-shadow: 0 0 15px var(--glow-white);
+            padding: 25px;
+            background: rgba(255,23,68,0.05);
+            border-radius: 15px;
+            border-left: 4px solid var(--neon-red);
+            position: relative;
+            z-index: 1;
+        }
+
+        .quote-author {
+            font-size: 16px;
+            color: var(--neon-red);
+            font-weight: bold;
+            text-shadow: 0 0 12px var(--glow-red);
+        }
+
+        /* Contact Section */
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            background: rgba(20,20,20,0.6);
+            border-radius: 15px;
+            border: 2px solid rgba(255,23,68,0.3);
+            transition: all 0.4s ease;
+            animation: slideInLeft 0.6s ease;
+        }
+
+        .contact-item:nth-child(even) {
+            animation: slideInRight 0.6s ease;
+        }
+
+        .contact-item:hover {
+            border-color: var(--neon-red);
+            box-shadow: 0 0 30px var(--glow-red);
+            transform: translateX(10px);
+        }
+
+        .contact-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--neon-red), #ff4569);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 0 25px var(--glow-red);
+            animation: icon-rotate 3s ease-in-out infinite;
+        }
+
+        @keyframes icon-rotate {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(10deg); }
+        }
+
+        .wa-button {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 18px 40px;
+            background: linear-gradient(135deg, #25D366, #20c55a);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 18px;
+            box-shadow: 0 0 30px rgba(37,211,102,0.6);
+            transition: all 0.3s ease;
+            animation: wa-pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes wa-pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 25px rgba(37,211,102,0.5); }
+            50% { transform: scale(1.05); box-shadow: 0 0 40px rgba(37,211,102,0.8); }
+        }
+
+        .wa-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 50px rgba(37,211,102,1);
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            background: rgba(10,10,10,0.98);
+            border-top: 2px solid rgba(255,23,68,0.3);
+            font-size: 15px;
+            color: rgba(255,255,255,0.7);
+            box-shadow: 0 -5px 30px rgba(255,23,68,0.2);
+        }
+
+        footer p {
+            text-shadow: 0 0 10px var(--glow-white);
+        }
+
+        /* Scroll Progress Bar */
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--neon-red), #ff4569);
+            box-shadow: 0 0 15px var(--glow-red);
+            z-index: 9999;
+            transition: width 0.2s ease;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .hero h1 { font-size: 38px; }
+            .section-title { font-size: 28px; }
+            .profile-img { width: 160px; height: 160px; }
+            .profile-ring { width: 190px; height: 190px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Scroll Progress -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+
+    <!-- Particles -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Loading Screen -->
+    <div id="loading">
+        <div class="loader">
+            <div class="loader-inner"></div>
+        </div>
+        <div class="loading-text">Loading Portfolio...</div>
+    </div>
+
+
+    <video id="bg-video" autoplay muted loop playsinline>
+        <source src="background-video.mp4" type="video/mp4">
+    </video>
+    <div class="video-overlay"></div>
+
+    <!-- Background Music -->
+    <audio id="bgMusic" loop>
+        
+        <source src="background-music.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Music Control -->
+    <div class="music-control" id="musicControl" onclick="toggleMusic()">
+        <div class="music-icon">🎵</div>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <div class="nav-container">
+            <div class="logo">RUDI</div>
+            <div class="hamburger" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        <nav class="nav-menu" id="navMenu">
+            <a href="#home" onclick="toggleMenu()">🏠 Home</a>
+            <a href="#about" onclick="toggleMenu()">👤 Tentang Saya</a>
+            <a href="#hobi" onclick="toggleMenu()">🎮 Hobi & Minat</a>
+            <a href="#skills" onclick="toggleMenu()">💻 Keahlian</a>
+            <a href="#pekerjaan" onclick="toggleMenu()">🔧 Pengalaman</a>
+            <a href="#quotes" onclick="toggleMenu()">💭 Inspirasi</a>
+            <a href="#contact" onclick="toggleMenu()">📞 Kontak</a>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+     <section class="hero" id="home">
+        <div class="profile-container">
+             <img src="rudi.png" alt="Rudi" class="profile-img">
+        </div>
+     </section>
+
+    <section class="hero" id="home">
+    <div class="hero-content">
+        <h1>RUDI</h1>
+        <p class="subtitle">Siswa Teknik Komputer dan Jaringan</p>
+
+        <div class="school-info">
+            <p><strong>🎓 Kelas:</strong> 11 TKJ</p>
+            <p><strong>🏫 Sekolah:</strong> SMKS Shalatiyah Bitin</p>
+            <p><strong>📍 Asal:</strong> PALBATU, Kalimantan Selatan</p>
+            <p><strong>💼 Jurusan:</strong> Teknik Komputer dan Jaringan</p>
+        </div>
+
+        <div class="hero-badge">⚡ Future Network Engineer ⚡</div>
+    </div>
+</section>
+
+
+    <!-- About Section -->
+    <section id="about">
+        <h2 class="section-title">Tentang Saya</h2>
+        <div class="card">
+            <h3>🌟 Profil Lengkap</h3>
+            <p>
+                Halo! Perkenalkan, nama saya <strong>RUDI</strong>, seorang siswa yang passionate di bidang teknologi informasi, 
+                khususnya Teknik Komputer dan Jaringan. Saat ini saya menempuh pendidikan di kelas 11 TKJ di 
+                <strong>SMKS Shalatiyah Bitin</strong>, PALBATU, Kalimantan Selatan.
+            </p>
+            <br>
+            <p>
+                Sejak kecil, saya selalu tertarik dengan dunia teknologi dan bagaimana komputer bekerja. 
+                Passion saya semakin berkembang ketika saya memutuskan untuk mengambil jurusan TKJ, di mana saya 
+                belajar banyak hal tentang jaringan komputer, server, keamanan siber, dan programming.
+            </p>
+            <br>
+            <p>
+                Saya adalah pribadi yang selalu haus akan ilmu pengetahuan baru, terutama dalam teknologi yang 
+                berkembang pesat. Saya percaya bahwa dengan menguasai teknologi, kita bisa menciptakan solusi 
+                untuk berbagai permasalahan dan membuat hidup lebih mudah. Visi saya adalah menjadi seorang 
+                <strong>Network Engineer profesional</strong> dan berkontribusi dalam membangun infrastruktur 
+                jaringan yang handal dan aman.
+            </p>
+            <br>
+            <p>
+                Selain teknis, saya juga aktif dalam berbagai kegiatan sekolah dan senang berkolaborasi dalam 
+                tim untuk menyelesaikan project-project teknologi. Saya percaya bahwa kombinasi antara hard skill 
+                dan soft skill adalah kunci kesuksesan di era digital ini.
+            </p>
+        </div>
+        <div class="card">
+            <h3>🎯 Visi & Misi</h3>
+            <p>
+                <strong>Visi:</strong> Menjadi profesional di bidang IT yang kompeten, inovatif, dan dapat memberikan 
+                kontribusi positif bagi perkembangan teknologi di Indonesia.
+            </p>
+            <br>
+            <p>
+                <strong>Misi:</strong><br>
+                • Terus belajar dan mengembangkan skill di bidang networking dan cybersecurity<br>
+                • Mengikuti perkembangan teknologi terkini dan mengaplikasikannya dalam project nyata<br>
+                • Berbagi ilmu dan pengalaman kepada sesama pelajar yang ingin berkembang di bidang IT<br>
+                • Membangun portfolio dan sertifikasi profesional untuk menunjang karir di masa depan
+            </p>
+        </div>
+    </section>
+
+    <!-- Hobi Section -->
+    <section id="hobi">
+        <h2 class="section-title">Hobi & Minat</h2>
+        <div class="card">
+            <h3>🎮 Gaming & Esports</h3>
+            <p>
+                Saya sangat menyukai dunia gaming, terutama game-game yang membutuhkan strategi dan teamwork seperti 
+                MOBA dan FPS. Gaming bukan hanya sekadar hiburan bagi saya, tetapi juga sarana untuk melatih 
+                kemampuan problem solving, decision making, dan komunikasi dalam tim. Melalui gaming, saya belajar 
+                pentingnya koordinasi, adaptasi cepat terhadap situasi, dan mental yang kuat dalam menghadapi tantangan.
+            </p>
+        </div>
+        <div class="card">
+            <h3>💻 Coding & Programming</h3>
+            <p>
+                Passion terbesar saya adalah coding dan programming. Saya senang mengeksplorasi berbagai bahasa 
+                pemrograman seperti Python, JavaScript, PHP, dan Java. Saya sering menghabiskan waktu untuk membuat 
+                project-project kecil, dari website sederhana hingga aplikasi automation. Saya juga aktif belajar 
+                melalui platform online seperti YouTube, documentation, dan forum developer untuk terus meningkatkan 
+                skill coding saya.
+            </p>
+        </div>
+        <div class="card">
+            <h3>🔧 Hardware & Troubleshooting</h3>
+            <p>
+                Saya memiliki ketertarikan mendalam terhadap hardware komputer. Dari merakit PC gaming, upgrade komponen, 
+                hingga melakukan troubleshooting masalah hardware. Saya percaya bahwa memahami hardware adalah fondasi 
+                penting bagi seorang teknisi IT. Saya juga suka bereksperimen dengan berbagai konfigurasi hardware 
+                untuk mendapatkan performa optimal, serta belajar tentang overclocking, cooling system, dan compatibility issues.
+            </p>
+        </div>
+        <div class="card">
+            <h3>📚 Belajar Teknologi Terbaru</h3>
+            <p>
+                Teknologi berkembang sangat cepat, dan saya selalu excited untuk mempelajari hal-hal baru. Saya rutin 
+                mengikuti berita teknologi, menonton tutorial, membaca artikel tentang AI, Machine Learning, IoT, 
+                Cloud Computing, Blockchain, dan Cybersecurity. Saya juga aktif di berbagai komunitas IT online untuk 
+                berdiskusi dan bertukar pengalaman dengan praktisi IT lainnya. Continuous learning adalah kunci untuk 
+                tetap relevan di industri teknologi.
+            </p>
+        </div>
+        <div class="card">
+            <h3>🌐 Networking & Cybersecurity</h3>
+            <p>
+                Sebagai siswa TKJ, saya sangat tertarik dengan dunia networking dan cybersecurity. Saya senang belajar 
+                tentang topologi jaringan, protokol, routing, switching, firewall, dan keamanan jaringan. Saya juga 
+                mulai mengeksplorasi ethical hacking dan penetration testing untuk memahami bagaimana sistem dapat 
+                diamankan dari ancaman cyber. Target saya adalah mendapatkan sertifikasi seperti CCNA dan CEH di masa depan.
+            </p>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section id="skills">
+        <h2 class="section-title">Keahlian Teknis</h2>
+        <div class="card">
+            <h3>🌐 Networking & Infrastructure</h3>
+            <p>
+                Menguasai fundamental networking termasuk OSI Model, TCP/IP, subnetting, VLAN, routing protocols 
+                (RIP, OSPF, EIGRP), dan network security. Berpengalaman dalam konfigurasi router Cisco dan MikroTik, 
+                serta troubleshooting network issues.
+            </p>
+            <div class="skills-container">
+                <div class="skill-item">
+                    <div class="skill-header">
+                        <span class="skill-name">Jaringan Komputer</span>
+                        <span class="skill-percent">95%</span>
+                    </div>
+                    <div class="skill-bar">
+                        <div class="skill-progress" style="width: 95%;"></div>
+                    </div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-header">
+                        <span class="skill-name">Router & Switch Configuration</span>
+                        <span class="skill-percent">90%</span>
+                    </div>
+                    <div class="skill-bar">
+                        <div class="skill-progress" style="width: 90%;"></div>
+                    </div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-header">
+                        <span class="skill-name">Network Security</span>
+                        <span class="skill-percent">85%</span>
+                    </div>
+                    <div class="skill-bar">
+                        <div class="skill-progress" style="width: 85%;"></div>
+                    </div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-header">
+                        <span class="skill-name">Troubleshooting</span>
+                        <span class="skill-percent">92%</span>
+                    </div>
+                    <div class="skill-bar">
+                        <div class="skill-progress" style="width: 92%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>💻 Web Development</h3>
+            <p>
+                Mampu mengembangkan website modern dan responsive menggunakan HTML5, CSS3, JavaScript, dan berbagai 
+                framework seperti Bootstrap dan Tailwind. Familiar dengan konsep front-end dan back-end development, 
+                serta REST API integration.
+            </p>
+            <div class="skills-container">
+                <div class="skill-item">
+                    <div class="skill-header">
+                        <span class="skill-name">HTML & CSS</span>
+                        <span class="skill-percent">93%</span>
+                    </div>
+                    <div class="skill-bar">
+                        <div class="skill-progress" style="width: 93%;"></div>
+                    </div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-header">
+                        <span class="skill-name">JavaScript</span>
+                        <span class="skill-percent">87%</span>
+                    </div>
+                    <div class="skill-bar">
+                        <div class="skill-progress" style="width: 87%;"></div>
+                    </div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-header">
+                        <span class="skill-name">Responsive Design</span>
+                        <span class="skill-percent">91%</span>
+                    </div>
+                    <div class="skill-bar">
+                        <div class="skill-progress" style="width: 91%;"></div>
+                    </div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-header">
+                        <span class="skill-name">PHP & MySQL</span>
+                        <span class="skill-percent">82%</span>
+                    </div>
+                    <div class="skill-bar">
+                        <div class="skill-progress" style="width: 82%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>🖥️ Sistem Operasi & Server</h3>
+            <p>
+                Berpengalaman dalam instalasi, konfigurasi, dan maintenance berbagai sistem operasi termasuk Windows 
+                Server, Linux (Ubuntu, Debian, CentOS), dan virtualisasi menggunakan VMware dan VirtualBox. Mampu 
+                mengkonfigurasi web server, mail server, dan file server.
+            </p>
+            <div class="skills-container">
+                <div class="skill-item">
+                    <div class="skill-header">
+                        <span class="skill-name">Windows Server</span>
+                        <span class="skill-percent">88%</span>
+                    </div>
+                    <div class="skill-bar">
+                        <div class="skill-progress" style="width: 88%;"></div>
+                    </div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-header">
+                        <span class="skill-name">Linux Administration</span>
+                        <span class="skill-percent">86%</span>
+                    </div>
+                    <div class="skill-bar">
+                        <div class="skill-progress" style="width: 86%;"></div>
+                    </div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-header">
+                        <span class="skill-name">Virtualization</span>
+                        <span class="skill-percent">84%</span>
+                    </div>
+                    <div class="skill-bar">
+                        <div class="skill-progress" style="width: 84%;"></div>
+                    </div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-header">
+                        <span class="skill-name">Server Configuration</span>
+                        <span class="skill-percent">89%</span>
+                    </div>
+                    <div class="skill-bar">
+                        <div class="skill-progress" style="width: 89%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>🗄️ Database Management</h3>
+            <p>
+                Menguasai design database, normalisasi, query optimization, dan database administration. Familiar 
+                dengan MySQL, PostgreSQL, dan MongoDB. Mampu membuat ERD, mengimplementasikan relational database, 
+                dan melakukan backup-restore database.
+            </p>
+            <div class="skills-container">
+                <div class="skill-item">
+                    <div class="skill-header">
+                        <span class="skill-name">MySQL</span>
+                        <span class="skill-percent">90%</span>
+                    </div>
+                    <div class="skill-bar">
+                        <div class="skill-progress" style="width: 90%;"></div>
+                    </div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-header">
+                        <span class="skill-name">Database Design</span>
+                        <span class="skill-percent">87%</span>
+                    </div>
+                    <div class="skill-bar">
+                        <div class="skill-progress" style="width: 87%;"></div>
+                    </div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-header">
+                        <span class="skill-name">SQL Query</span>
+                        <span class="skill-percent">92%</span>
+                    </div>
+                    <div class="skill-bar">
+                        <div class="skill-progress" style="width: 92%;"></div>
+                    </div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-header">
+                        <span class="skill-name">Database Administration</span>
+                        <span class="skill-percent">85%</span>
+                    </div>
+                    <div class="skill-bar">
+                        <div class="skill-progress" style="width: 85%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pekerjaan/Experience Section -->
+    <section id="pekerjaan">
+        <h2 class="section-title">Pengalaman & Project</h2>
+        <div class="card">
+            <h3>🔌 Project: Konfigurasi Jaringan Sekolah</h3>
+            <p>
+                Membantu konfigurasi dan maintenance jaringan komputer di lab TKJ sekolah. Melakukan setup router 
+                MikroTik, konfigurasi VLAN untuk segmentasi network, implementasi hotspot system, dan monitoring 
+                bandwidth usage. Project ini memberikan pengalaman praktis dalam mengelola jaringan skala kecil-menengah.
+            </p>
+        </div>
+        <div class="card">
+            <h3>🌐 Project: Website Sekolah</h3>
+            <p>
+                Berpartisipasi dalam pengembangan website sekolah menggunakan HTML, CSS, JavaScript, dan PHP. 
+                Bertanggung jawab untuk membuat desain responsive, integrasi database MySQL untuk sistem informasi 
+                siswa, dan implementasi CMS untuk memudahkan update konten. Website telah diakses oleh ribuan pengunjung.
+            </p>
+        </div>
+        <div class="card">
+            <h3>💼 Pengalaman: Technical Support</h3>
+            <p>
+                Membantu troubleshooting masalah komputer teman-teman dan guru di sekolah, mulai dari hardware issues, 
+                software installation, virus removal, data recovery, hingga konfigurasi printer dan network. Pengalaman 
+                ini melatih kemampuan komunikasi dan problem solving saya dalam memberikan solusi teknis yang efektif.
+            </p>
+        </div>
+        <div class="card">
+            <h3>🏆 Prestasi: Juara Lomba Jaringan</h3>
+            <p>
+                Meraih juara 2 dalam Lomba Kompetensi Siswa (LKS) bidang IT Network Systems Administration tingkat 
+                kabupaten. Kompetisi ini menguji kemampuan dalam network design, router configuration, troubleshooting, 
+                dan network security. Prestasi ini memotivasi saya untuk terus mengembangkan skill di bidang networking.
+            </p>
+        </div>
+        <div class="card">
+            <h3>📜 Sertifikasi & Pelatihan</h3>
+            <p>
+                • MikroTik Certified Network Associate (MTCNA) - In Progress<br>
+                • Cisco Networking Essentials - Completed<br>
+                • Web Development Bootcamp - Completed<br>
+                • Cybersecurity Fundamental - Completed<br>
+                • Linux System Administration - In Progress
+            </p>
+        </div>
+    </section>
+
+    <!-- Quote Section -->
+    <section class="quote-section" id="quotes">
+        <h2 class="section-title">Kata-Kata Inspirasi</h2>
+        
+        <div class="quote-item">
+            <p class="quote-text">
+                "Teknologi bukan hanya tentang kode dan jaringan, tapi tentang menciptakan solusi yang mengubah 
+                kehidupan dan membuat dunia menjadi lebih baik."
+            </p>
+            <p class="quote-author">- RUDI</p>
+        </div>
+
+        <div class="quote-item">
+            <p class="quote-text">
+                "Jangan pernah berhenti belajar, karena kehidupan tidak pernah berhenti mengajar. Setiap tantangan 
+                adalah kesempatan untuk berkembang."
+            </p>
+            <p class="quote-author">- Anonymous</p>
+        </div>
+
+        <div class="quote-item">
+            <p class="quote-text">
+                "Kesuksesan bukan tentang seberapa pintar kamu, tapi seberapa gigih kamu dalam menghadapi kegagalan 
+                dan terus bangkit untuk mencoba lagi."
+            </p>
+            <p class="quote-author">- Steve Jobs</p>
+        </div>
+
+        <div class="quote-item">
+            <p class="quote-text">
+                "Di era digital ini, yang bertahan bukanlah yang terkuat, melainkan yang paling cepat beradaptasi 
+                dengan perubahan teknologi."
+            </p>
+            <p class="quote-author">- Charles Darwin (Adapted)</p>
+        </div>
+
+        <div class="quote-item">
+            <p class="quote-text">
+                "Network bukan hanya tentang menghubungkan komputer, tapi tentang menghubungkan manusia, ide, dan 
+                masa depan."
+            </p>
+            <p class="quote-author">- RUDI</p>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact">
+        <h2 class="section-title">Hubungi Saya</h2>
+        <div class="contact-info">
+            <div class="contact-item">
+                <div class="contact-icon">📧</div>
+                <div>
+                    <strong style="color: var(--neon-red);">Email</strong><br>
+                    <span style="color: rgba(255,255,255,0.9);">rudir.tkj@gmail.com</span>
+                </div>
+            </div>
+            <div class="contact-item">
+                <div class="contact-icon">📱</div>
+                <div>
+                    <strong style="color: var(--neon-red);">WhatsApp</strong><br>
+                    <span style="color: rgba(255,255,255,0.9);">+62 812-3456-7890</span>
+                </div>
+            </div>
+            <div class="contact-item">
+                <div class="contact-icon">💬</div>
+                <div>
+                    <strong style="color: var(--neon-red);">Instagram</strong><br>
+                    <span style="color: rgba(255,255,255,0.9);">@rudi_tkj</span>
+                </div>
+            </div>
+            <div class="contact-item">
+                <div class="contact-icon">🐙</div>
+                <div>
+                    <strong style="color: var(--neon-red);">GitHub</strong><br>
+                    <span style="color: rgba(255,255,255,0.9);">github.com/RUDI-tkj</span>
+                </div>
+            </div>
+            <div class="contact-item">
+    <div class="contact-icon">📍</div>
+    <div>
+        <strong style="color: var(--neon-red);">Alamat</strong><br>
+        <a href="https://www.google.com/maps/place/Palbatu,+Kalimantan+Selatan" 
+           target="_blank" 
+           style="color: rgba(255,255,255,0.9); text-decoration: none;">
+            PALBATU, Kalimantan Selatan, Indonesia
+        </a>
+    </div>
+</div>
+
+            <div class="contact-item">
+                <div class="contact-icon">🏫</div>
+                <div>
+                    <strong style="color: var(--neon-red);">Sekolah</strong><br>
+                    <span style="color: rgba(255,255,255,0.9);">SMKS Shalatiyah Bitin</span><br>
+                    <span style="color: rgba(255,255,255,0.7); font-size: 14px;">Jurusan Teknik Komputer dan Jaringan</span>
+                </div>
+            </div>
+        </div>
+        <!-- Ganti nomor dengan nomor WA Anda (format: 628xxxxxxxxxx) -->
+        <a href="https://wa.me/+6287797630439?text=Halo%20Noir%2C%20saya%20tertarik%20dengan%20portfolio%20Anda!" target="_blank" class="wa-button">
+            💬 Chat via WhatsApp
+        </a>
+    </section>
+
+    <footer>
+        <p>© 2024 <strong style="color: var(--neon-red);">RUDI</strong> - Siswa TKJ SMKS Shalatiyah Bitin</p>
+        <p style="font-size: 13px; margin-top: 8px; opacity: 0.7;">Made with ❤️ and ☕ | All Rights Reserved</p>
+    </footer>
+
+    <script>
+        // Generate Particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+        createParticles();
+
+        // Loading Screen
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                document.getElementById('loading').style.opacity = '0';
+                setTimeout(function() {
+                    document.getElementById('loading').style.display = 'none';
+                }, 500);
+            }, 3000);
+        });
+
+        // Background Music
+        let musicPlaying = false;
+        const bgMusic = document.getElementById('bgMusic');
+        const musicControl = document.getElementById('musicControl');
+
+        function toggleMusic() {
+            if (musicPlaying) {
+                bgMusic.pause();
+                musicControl.querySelector('.music-icon').textContent = '🔇';
+                musicPlaying = false;
+            } else {
+                bgMusic.play();
+                musicControl.querySelector('.music-icon').textContent = '🎵';
+                musicPlaying = true;
+            }
+        }
+
+        // Auto play music after loading (with user interaction)
+        document.addEventListener('click', function() {
+            if (!musicPlaying && bgMusic.paused) {
+                bgMusic.play().then(() => {
+                    musicPlaying = true;
+                    musicControl.querySelector('.music-icon').textContent = '🎵';
+                }).catch(() => {
+                    // Autoplay prevented
+                });
+            }
+        }, { once: true });
+
+        // Scroll Progress Bar
+        window.addEventListener('scroll', function() {
+            const scrollProgress = document.getElementById('scrollProgress');
+            const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const scrolled = (window.scrollY / scrollHeight) * 100;
+            scrollProgress.style.width = scrolled + '%';
+        });
+
+        // Hamburger Menu Toggle
+        function toggleMenu() {
+            const hamburger = document.querySelector('.hamburger');
+            const navMenu = document.getElementById('navMenu');
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+        }
+
+        // Smooth Scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', function(e) {
+            const navMenu = document.getElementById('navMenu');
+            const hamburger = document.querySelector('.hamburger');
+            if (!navMenu.contains(e.target) && !hamburger.contains(e.target)) {
+                navMenu.classList.remove('active');
+                hamburger.classList.remove('active');
+            }
+        });
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe all cards
+        document.querySelectorAll('.card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(50px)';
+            card.style.transition = 'all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+            observer.observe(card);
+        });
+
+        // Animate skill bars when in view
+        const skillObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const progressBars = entry.target.querySelectorAll('.skill-progress');
+                    progressBars.forEach(bar => {
+                        bar.style.animation = 'skill-load 2s ease-out forwards, gradient-shift 3s ease-in-out infinite';
+                    });
+                    skillObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        document.querySelectorAll('.skills-container').forEach(container => {
+            skillObserver.observe(container);
+        });
+
+        // Parallax effect for hero section
+        window.addEventListener('scroll', function() {
+            const scrolled = window.pageYOffset;
+            const hero = document.querySelector('.hero');
+            if (hero && scrolled < window.innerHeight) {
+                hero.style.transform = 'translateY(' + scrolled * 0.5 + 'px)';
+                hero.style.opacity = 1 - scrolled / 700;
+            }
+        });
+
+        // Add hover sound effect simulation (visual feedback)
+        document.querySelectorAll('.card, .contact-item, .wa-button').forEach(element => {
+            element.addEventListener('mouseenter', function() {
+                this.style.transition = 'all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+            });
+        });
+
+        // Dynamic text shadow on mouse move for hero title
+        const heroTitle = document.querySelector('.hero h1');
+        if (heroTitle) {
+            document.addEventListener('mousemove', function(e) {
+                const x = (e.clientX / window.innerWidth - 0.5) * 20;
+                const y = (e.clientY / window.innerHeight - 0.5) * 20;
+                heroTitle.style.textShadow = `
+                    ${x}px ${y}px 30px var(--glow-red),
+                    ${-x}px ${-y}px 50px var(--glow-red)
+                `;
+            });
+        }
+    </script>
+</body>
+</html>
